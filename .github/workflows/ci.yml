@@ -17,14 +17,19 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake libgtest-dev
+        sudo apt-get install -y build-essential cmake libgtest-dev googletest
         
-    - name: Build GTest
+    - name: Build GTest (if needed)
       run: |
-        cd /usr/src/gtest
-        sudo cmake CMakeLists.txt
-        sudo make
-        sudo cp *.a /usr/lib
+        # Only build if libraries aren't already installed
+        if [ ! -f /usr/lib/libgtest.a ] || [ ! -f /usr/lib/libgtest_main.a ]; then
+          cd /usr/src/googletest
+          sudo cmake CMakeLists.txt
+          sudo make
+          sudo mkdir -p /usr/lib
+          sudo cp lib/*.a /usr/lib/
+        fi
+        
         
     - name: Create build directory
       run: mkdir -p build
